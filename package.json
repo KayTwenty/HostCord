@@ -1,0 +1,27 @@
+{
+  "name": "hostcord",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "ts-node src/index.ts",
+    "build": "tsc",
+    "fetch-versions": "ts-node scripts/fetch-mc-versions.ts",
+    "dev": "nodemon --watch src --ext ts --exec ts-node src/index.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "discord.js": "^14.22.1",
+    "dotenv": "^17.2.2",
+    "rcon-client": "^4.2.5"
+  },
+  "devDependencies": {
+    "@types/node": "^24.5.2",
+    "nodemon": "^3.1.9",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.2"
+  }
+}
