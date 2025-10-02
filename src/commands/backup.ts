@@ -46,8 +46,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
   const backupFile = path.join(serverBackupDir, `world-${timestamp}.tar.gz`);
 
-  // Archive the world folder from the running container (cross-platform)
-    // Use output redirection for both platforms (works in PowerShell, CMD, and sh)
+  // Archive the world folder from the running container
     const backupCmd = `docker exec ${containerName} tar czf - world > "${backupFile}"`;
   exec(backupCmd, async (err, stdout, stderr) => {
     if (err) {
@@ -66,6 +65,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
   });
 }
 
+// Autocomplete for container names the user owns
 export async function autocomplete(interaction: AutocompleteInteraction<CacheType>) {
   const userId = interaction.user.id;
   const servers = getUserServers(userId);

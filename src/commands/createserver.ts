@@ -80,6 +80,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     });
   }
 
+  // Build and send the embed response with server details
   const embed = buildEmbed({
     title: 'Minecraft Server Request',
     description: result.success

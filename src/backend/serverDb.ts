@@ -20,6 +20,7 @@ function ensureDbFile() {
   }
 }
 
+// Functions to manage user servers in a JSON file
 export function addUserServer(server: UserServer) {
   ensureDbFile();
   const servers = getAllServers();
@@ -27,6 +28,7 @@ export function addUserServer(server: UserServer) {
   fs.writeFileSync(DB_PATH, JSON.stringify(servers, null, 2), 'utf-8');
 }
 
+// Remove a server by container name
 export function removeUserServer(containerName: string) {
   ensureDbFile();
   let servers = getAllServers();
@@ -34,11 +36,13 @@ export function removeUserServer(containerName: string) {
   fs.writeFileSync(DB_PATH, JSON.stringify(servers, null, 2), 'utf-8');
 }
 
+// Get all servers for a specific user
 export function getUserServers(userId: string): UserServer[] {
   ensureDbFile();
   return getAllServers().filter(s => s.userId === userId);
 }
 
+// Get all servers
 export function getAllServers(): UserServer[] {
   ensureDbFile();
   return JSON.parse(fs.readFileSync(DB_PATH, 'utf-8'));
