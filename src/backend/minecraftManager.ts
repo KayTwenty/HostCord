@@ -20,9 +20,9 @@ export function startMinecraftServer(options: MinecraftServerOptions): Promise<{
     const rconPassword = options.rconPassword;
   // Always use latest image, set VERSION env for custom version
   const versionEnv = version !== 'latest' ? `-e VERSION=${version}` : '';
-  // Set MEMORY=2G for JVM and -m 2g for Docker
+  // Set MEMORY=2G for JVM and -m 4g for Docker
   const memoryEnv = '-e MEMORY=2G';
-  const memoryLimit = '-m 2g';
+  const memoryLimit = '-m 4g';
   const cmd = `docker run -d --name ${containerName} ${memoryLimit} -e EULA=TRUE -e MAX_PLAYERS=${maxPlayers} ${versionEnv} ${memoryEnv} -e ENABLE_RCON=true -e RCON_PORT=${rconPort} -e RCON_PASSWORD=${rconPassword} -p ${port}:25565 -p ${rconPort}:${rconPort} itzg/minecraft-server:latest`;
     log(`[MC] Creating container: ${containerName} on port ${port} (maxPlayers: ${maxPlayers}, version: ${version}, rconPort: ${rconPort})`);
     exec(cmd, (error, stdout, stderr) => {
