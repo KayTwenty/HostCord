@@ -29,48 +29,6 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     return;
   }
 
-  // Check player count via RCON first
-  const { rconPort, rconPassword, ip } = found;
-  let playerCount = undefined;
-  if (rconPort && rconPassword && ip) {
-    const rconRes = await sendRconMessage({
-      host: ip.split(':')[0],
-      port: rconPort,
-      password: rconPassword,
-      message: 'list',
-      raw: true
-    });
-    if (rconRes.success && rconRes.result) {
-      const match = rconRes.result.match(/There are (\d+) of a max (\d+) players online/);
-      if (match) playerCount = parseInt(match[1], 10);
-    }
-  }
-
-  if (playerCount === 0) {
-    await interaction.reply({ embeds: [buildEmbed({
-      title: 'No Players Online',
-      description: `No players are online. Stopping and deleting server immediately.`,
-      color: 0xffaa00
-    })] });
-    exec(`docker stop ${containerName} && docker rm -v ${containerName}`, (error, stdout, stderr) => {
-      if (error) {
-        interaction.editReply({ embeds: [buildEmbed({
-          title: 'Failed to Stop Server',
-          description: `Failed to stop and delete server:\n\n\`\`\`${stderr || error.message}\`\`\``,
-          color: 0xff5555
-        })] });
-      } else {
-        removeUserServer(containerName);
-        interaction.editReply({ embeds: [buildEmbed({
-          title: 'Server Stopped',
-          description: `Server \n\`\`\`${containerName}\`\`\` stopped and deleted (including its data volume).`,
-          color: 0x55ff55
-        })] });
-      }
-    });
-    return;
-  }
-
   await interaction.reply({ embeds: [buildEmbed({
     title: 'Warning Players',
     description: `Sending in-game warning to players. Server will stop in 30 seconds...`,
@@ -78,6 +36,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
   })] });
 
   // Send RCON warning
+  const { rconPort, rconPassword, ip } = found;
   let rconResult: { success: boolean; error?: string; result?: string } = { success: false, error: 'Not attempted' };
   if (rconPort && rconPassword && ip) {
     rconResult = await sendRconMessage({

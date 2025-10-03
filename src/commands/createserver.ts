@@ -84,14 +84,12 @@ export async function execute(interaction: ChatInputCommandInteraction) {
   const embed = buildEmbed({
     title: 'Minecraft Server Request',
     description: result.success
-      ? `Your Minecraft server is starting!`
+      ? `Your Minecraft server has started!`
       : `There was an error starting your server.`,
     color: result.success ? 0x57a8ff : 0xff5555,
     fields: [
       { name: 'Game', value: 'Minecraft', inline: true },
       { name: 'Server Name', value: `mc_${name}`, inline: true },
-      { name: 'IP', value: localAddress, inline: true },
-      { name: 'Port', value: result.success ? `${port}` : 'N/A', inline: true },
       { name: 'Version', value: version, inline: true },
       { name: 'Max Players', value: maxPlayers.toString(), inline: true },
       { name: 'Status', value: result.success ? 'Running' : 'Error', inline: true },
