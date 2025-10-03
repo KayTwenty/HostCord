@@ -1,4 +1,3 @@
-
 import { Client, GatewayIntentBits, Events, Collection, Interaction } from 'discord.js';
 import { config } from 'dotenv';
 import fs from 'fs';
@@ -6,6 +5,7 @@ import path from 'path';
 import { registerSlashCommands } from './handlers/slashCommandHandler';
 import { log } from './handlers/logger';
 import type { Command } from './types';
+import { handleComponentInteraction } from './commands/createserver';
 
 // Shitty workaround for dotenv warning spam
 config({quiet : true});
@@ -63,6 +63,11 @@ client.on(Events.InteractionCreate, async (interaction: Interaction) => {
         log('Error in autocomplete handler: ' + error);
       }
     }
+  }
+  // Delegate select menus, buttons, and modals for createserver to its handler
+  if (interaction.isStringSelectMenu() || interaction.isButton() || interaction.isModalSubmit()) {
+    await handleComponentInteraction(interaction);
+    return;
   }
 });
 

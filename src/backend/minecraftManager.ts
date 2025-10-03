@@ -8,6 +8,8 @@ export interface MinecraftServerOptions {
   version?: string;
   rconPort: number;
   rconPassword: string;
+  motd?: string;
+  gamemode?: string;
 }
 
 export function startMinecraftServer(options: MinecraftServerOptions): Promise<{ success: boolean; message: string }> {
@@ -18,13 +20,17 @@ export function startMinecraftServer(options: MinecraftServerOptions): Promise<{
     const version = options.version || 'latest';
     const rconPort = options.rconPort;
     const rconPassword = options.rconPassword;
-  // Always use latest image, set VERSION env for custom version
-  const versionEnv = version !== 'latest' ? `-e VERSION=${version}` : '';
-  // Set MEMORY=2G for JVM and -m 4g for Docker
-  const memoryEnv = '-e MEMORY=2G';
-  const memoryLimit = '-m 4g';
-  const cmd = `docker run -d --name ${containerName} ${memoryLimit} -e EULA=TRUE -e MAX_PLAYERS=${maxPlayers} ${versionEnv} ${memoryEnv} -e ENABLE_RCON=true -e RCON_PORT=${rconPort} -e RCON_PASSWORD=${rconPassword} -p ${port}:25565 -p ${rconPort}:${rconPort} itzg/minecraft-server:latest`;
-    log(`[MC] Creating container: ${containerName} on port ${port} (maxPlayers: ${maxPlayers}, version: ${version}, rconPort: ${rconPort})`);
+    const motd = options.motd;
+    const gamemode = options.gamemode;
+    // Always use latest image, set VERSION env for custom version
+    const versionEnv = version !== 'latest' ? `-e VERSION=${version}` : '';
+    // Set MEMORY=2G for JVM and -m 4g for Docker
+    const memoryEnv = '-e MEMORY=2G';
+    const memoryLimit = '-m 4g';
+  const motdEnv = motd ? `-e MOTD=\"${motd.replace(/"/g, '')}\"` : '';
+  const gamemodeEnv = gamemode ? `-e GAMEMODE=${gamemode}` : '';
+  const cmd = `docker run -d --name ${containerName} ${memoryLimit} -e EULA=TRUE -e MAX_PLAYERS=${maxPlayers} ${versionEnv} ${memoryEnv} -e ENABLE_RCON=true -e RCON_PORT=${rconPort} -e RCON_PASSWORD=${rconPassword} ${motdEnv} ${gamemodeEnv} -p ${port}:25565 -p ${rconPort}:${rconPort} itzg/minecraft-server:latest`;
+  log(`[MC] Creating container: ${containerName} on port ${port} (maxPlayers: ${maxPlayers}, version: ${version}, rconPort: ${rconPort}, motd: ${motd || ''}, gamemode: ${gamemode || ''})`);
     exec(cmd, (error, stdout, stderr) => {
       if (error) {
         log(`[MC] Error creating container ${containerName}: ${stderr || error.message}`);
