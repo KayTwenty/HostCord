@@ -17,9 +17,10 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 
   const fields = servers.map((s, i) => ({
     name: `Server #${i + 1}`,
-    value: `Container: \
-\`\`\`${s.containerName}\`\`\`\nPort: \
-\`\`\`${s.port}\`\`\`\nCreated: <t:${Math.floor(s.createdAt / 1000)}:R>`
+    value: `Container: \`\`\`${s.containerName}\`\`\`
+Address: \`\`\`${s.ip}\`\`\`
+Port: \`\`\`${s.port}\`\`\`
+Created: <t:${Math.floor(s.createdAt / 1000)}:R>`
   }));
 
   const embed = buildEmbed({

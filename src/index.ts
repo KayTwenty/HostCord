@@ -6,6 +6,7 @@ import { registerSlashCommands } from './handlers/slashCommandHandler';
 import { log } from './handlers/logger';
 import type { Command } from './types';
 import { handleComponentInteraction } from './commands/createserver';
+import { setDiscordClient } from './handlers/discordNotify';
 
 // Shitty workaround for dotenv warning spam
 config({quiet : true});
@@ -17,6 +18,7 @@ interface CustomClient extends Client {
 const client = new Client({
   intents: [GatewayIntentBits.Guilds],
 }) as CustomClient;
+setDiscordClient(client);
 client.commands = new Collection();
 
 const commandsPath = path.join(__dirname, 'commands');

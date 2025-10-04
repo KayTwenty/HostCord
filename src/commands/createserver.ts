@@ -69,8 +69,19 @@ function getSetupComponents(setup: PendingServerSetup) {
     .setDisabled(!setup.gamemode || !!setup.version)
     .addOptions([
       { label: '1.20.4', value: '1.20.4' },
+      { label: '1.20.2', value: '1.20.2' },
       { label: '1.20.1', value: '1.20.1' },
       { label: '1.19.4', value: '1.19.4' },
+      { label: '1.19.3', value: '1.19.3' },
+      { label: '1.19.2', value: '1.19.2' },
+      { label: '1.18.2', value: '1.18.2' },
+      { label: '1.17.1', value: '1.17.1' },
+      { label: '1.16.5', value: '1.16.5' },
+      { label: '1.15.2', value: '1.15.2' },
+      { label: '1.14.4', value: '1.14.4' },
+      { label: '1.13.2', value: '1.13.2' },
+      { label: '1.12.2', value: '1.12.2' },
+      { label: '1.8.9', value: '1.8.9' },
       { label: 'Latest', value: 'latest' },
     ]);
   const motdButton = new ButtonBuilder()
@@ -240,9 +251,10 @@ export async function handleComponentInteraction(interaction: any) {
         ...(result.success
           ? [{
               name: 'Connection Info',
-              value: `000
+              value: `\`\`\`
 ${localAddress}
-000\nCopy and paste this into Minecraft to join!`
+\`\`\`
+Copy and paste this into Minecraft to join!`
             }]
           : [{ name: 'Error', value: result.message }])
       ],

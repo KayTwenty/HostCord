@@ -3,6 +3,7 @@ import { getUserServers } from '../backend/serverDb';
 import { buildEmbed } from '../handlers/embedBuilder';
 import { exec } from 'child_process';
 import { sendRconMessage } from '../backend/rconUtil';
+import { getMinecraftServerStatus } from '../backend/minecraftManager';
 
 export const data = new SlashCommandBuilder()
   .setName('status')
@@ -31,11 +32,25 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 
   await interaction.reply({ embeds: [buildEmbed({
     title: 'Fetching Status',
-    description: `Gathering status for \`${containerName}\`...`,
+    description: `Gathering status for \
+\
+\
+${containerName}\n\n\n...`,
     color: 0x57a8ff
   })] });
 
-  // Get Docker stats (uptime, CPU, memory)
+  // Health check (container + port)
+  const health = await getMinecraftServerStatus(containerName, found.port);
+  let statusEmoji = '🔴';
+  let statusText = 'Stopped';
+  if (health.running && health.portOpen) {
+    statusEmoji = '🟢';
+    statusText = 'Online';
+  } else if (health.running && !health.portOpen) {
+    statusEmoji = '🟡';
+    statusText = 'Unreachable';
+  }
+
   exec(`docker inspect -f "{{.State.StartedAt}}" ${containerName}`, async (err, stdout) => {
     let uptime = 'Unknown';
     if (!err && stdout) {
@@ -52,6 +67,10 @@ export async function execute(interaction: ChatInputCommandInteraction) {
       let cpu = 'Unknown', mem = 'Unknown';
       if (!err2 && stdout2) {
         [cpu, mem] = stdout2.trim().split('|');
+        if (cpu && cpu !== 'Unknown') {
+          const cpuNum = parseFloat(cpu.replace('%', ''));
+          cpu = isNaN(cpuNum) ? cpu : `${cpuNum.toFixed(1)}%`;
+        }
       }
 
       // Get player count via RCON
@@ -65,7 +84,6 @@ export async function execute(interaction: ChatInputCommandInteraction) {
           raw: true
         });
         if (rconRes.success && rconRes.result) {
-          // Typical response: "There are 1 of a max 20 players online: Player1"
           const match = rconRes.result.match(/There are (\d+) of a max (\d+) players online/);
           if (match) {
             players = `${match[1]} / ${match[2]}`;
@@ -79,8 +97,9 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 
       const embed = buildEmbed({
         title: `Status: ${containerName}`,
-        color: 0x57a8ff,
+        color: health.running ? 0x57a8ff : 0xff5555,
         fields: [
+          { name: 'Status', value: `${statusEmoji} ${statusText}`, inline: true },
           { name: 'Uptime', value: uptime, inline: true },
           { name: 'CPU', value: cpu, inline: true },
           { name: 'Memory', value: mem, inline: true },
